@@ -1,0 +1,754 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>hu-flow · AI agent workflow by Agustín Rodriguez</title>
+<meta name="description" content="hu-flow: 12 Claude Code agents that take a user story to a merge-ready branch, with a human at every checkpoint. Interactive walkthrough.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="hu-flow · AI agent workflow by Agustín Rodriguez">
+<meta property="og:description" content="From user story to merge-ready branch, with a human at every checkpoint. Watch each command run.">
+<meta property="og:url" content="https://agustin-1998.github.io/hu-flow/">
+<meta property="og:image" content="https://agustin-1998.github.io/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://agustin-1998.github.io/hu-flow/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Showcase de una sola columna: titular, recorrido animado como pieza central, y tres bloques cortos. Verde = pasa, naranja = punto de control humano. */
+:root{
+  --bg:#F4F6F3; --surface:#FFFFFF; --sunk:#EBEFEA; --ink:#17211C; --muted:#56635C; --faint:#7C8882;
+  --rule:#D6DDD7; --accent:#1E7A4C; --accent-ink:#FFFFFF; --accent-soft:#E1F0E7;
+  --stop:#C2410C; --stop-soft:#FCEBDF;
+  --opus:#5B2E91; --opus-soft:#EFE6FA; --sonnet:#1D4E80; --sonnet-soft:#E2EDF8; --haiku:#256B3F; --haiku-soft:#E3F3E8;
+  --you:#0F5E8C; --you-soft:#E0EFF8;
+  --term:#17211C; --term-ink:#DDE6E0; --term-dim:#8FA096; --term-accent:#6FD6A0; --term-stop:#F5A06A; --term-rule:#2B3731;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif; --body:"IBM Plex Sans","Segoe UI",Roboto,sans-serif; --mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1512; --surface:#161E1A; --sunk:#1C2621; --ink:#E4EBE6; --muted:#A0ACA5; --faint:#7F8B85;
+    --rule:#2A3530; --accent:#4CC38A; --accent-ink:#08140E; --accent-soft:#16301F;
+    --stop:#F28C4E; --stop-soft:#3A2114;
+    --opus:#C9A7F5; --opus-soft:#2B1E3F; --sonnet:#8CB9EE; --sonnet-soft:#172A40; --haiku:#86D3A1; --haiku-soft:#15301F;
+    --you:#7CC4EE; --you-soft:#12293A;
+    --term:#0A0F0C; --term-ink:#DDE6E0; --term-dim:#7F8B85; --term-accent:#4CC38A; --term-stop:#F28C4E; --term-rule:#23302A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1512; --surface:#161E1A; --sunk:#1C2621; --ink:#E4EBE6; --muted:#A0ACA5; --faint:#7F8B85;
+  --rule:#2A3530; --accent:#4CC38A; --accent-ink:#08140E; --accent-soft:#16301F;
+  --stop:#F28C4E; --stop-soft:#3A2114;
+  --opus:#C9A7F5; --opus-soft:#2B1E3F; --sonnet:#8CB9EE; --sonnet-soft:#172A40; --haiku:#86D3A1; --haiku-soft:#15301F;
+  --you:#7CC4EE; --you-soft:#12293A;
+  --term:#0A0F0C; --term-ink:#DDE6E0; --term-dim:#7F8B85; --term-accent:#4CC38A; --term-stop:#F28C4E; --term-rule:#23302A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+h1,h2,h3{font-family:var(--display);line-height:1.12;text-wrap:balance;margin:0}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;padding-block:20px 0}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-weight:500;font-size:1rem;color:var(--ink)}
+.brand i{width:12px;height:12px;border-radius:3px;background:var(--accent);transform:rotate(45deg);display:block}
+.by{font-size:.88rem;color:var(--muted)}
+.hero{display:grid;gap:16px;padding-block:44px 28px;max-width:860px}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(2rem,4.4vw,3.1rem);font-weight:800;letter-spacing:-.025em}
+h1 em{font-style:normal;color:var(--stop)}
+.lead{font-size:1.1rem;color:var(--muted);max-width:64ch}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.fact{display:flex;align-items:baseline;gap:7px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:7px 11px}
+.fact b{font-family:var(--display);font-size:1.2rem;font-variant-numeric:tabular-nums}
+.fact span{color:var(--muted);font-size:.86rem}
+.sim{display:grid;gap:12px;padding-top:8px}
+.sim-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px}
+.sim-head h2{font-size:1.35rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted);align-items:center}
+.legend .ok::before,.legend .st::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:-1px}
+.legend .st::before{border-radius:2px;background:var(--stop);transform:rotate(45deg)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;padding-top:44px}
+.note{display:grid;gap:8px;align-content:start;padding-top:14px;border-top:2px solid var(--accent);min-width:0}
+.note.st{border-top-color:var(--stop)}
+.note h3{font-size:1.05rem}
+.note p,.note li{font-size:.94rem;color:var(--muted)}
+.note ul{margin:0;padding-left:1.1em;display:grid;gap:5px}
+.note code{font-family:var(--mono);font-size:.84em;background:var(--sunk);border:1px solid var(--rule);border-radius:4px;padding:.05em .35em}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--rule);font-size:.86rem;color:var(--faint);display:flex;flex-wrap:wrap;gap:6px 18px}
+
+/* FS-CSS:BEGIN */
+/* Recorrido animado: riel de pasos arriba, tarjeta del paso a la izquierda, sesión y archivos a la derecha. Usa los tokens del manual. */
+.fs{display:grid;gap:14px;min-width:0}
+.fs-rail{position:relative;display:grid;grid-template-columns:repeat(var(--fs-n),minmax(0,1fr));gap:0;padding:6px 0 2px}
+.fs-rail::before,.fs-fill{content:"";position:absolute;left:calc(50% / var(--fs-n));right:calc(50% / var(--fs-n));top:20px;height:2px;background:var(--rule);border-radius:1px}
+.fs-fill{right:auto;width:0;background:var(--accent);transition:width .5s ease}
+.fs-node{position:relative;z-index:1;display:grid;justify-items:center;gap:5px;background:none;border:0;padding:0;cursor:pointer;color:var(--faint);font:inherit;min-width:0}
+.fs-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:2px solid var(--rule);font-family:var(--mono);font-size:.72rem;font-weight:500;color:var(--faint);font-variant-numeric:tabular-nums;transition:background .3s,border-color .3s,color .3s,transform .3s}
+.fs-node.stop .fs-dot{border-radius:5px;transform:rotate(45deg)}
+.fs-node.stop .fs-dot span{transform:rotate(-45deg)}
+.fs-node .fs-lab{font-family:var(--mono);font-size:.68rem;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.fs-node.done .fs-dot{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.fs-node.done.stop .fs-dot{background:var(--stop-soft);border-color:var(--stop);color:var(--stop)}
+.fs-node.now .fs-dot{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fs-node.now.stop .fs-dot{background:var(--stop);border-color:var(--stop);color:var(--accent-ink)}
+.fs-node.now .fs-lab{color:var(--ink);font-weight:500}
+.fs-node:hover .fs-dot{border-color:var(--accent)}
+.fs.playing .fs-node.now .fs-dot{animation:fs-pulse 1.4s ease-in-out infinite}
+.fs.playing .fs-node.now.stop .fs-dot{animation:fs-pulse-stop 1.4s ease-in-out infinite}
+@keyframes fs-pulse{0%,100%{box-shadow:0 0 0 0 var(--accent-soft)}50%{box-shadow:0 0 0 7px var(--accent-soft)}}
+@keyframes fs-pulse-stop{0%,100%{box-shadow:0 0 0 0 var(--stop-soft)}50%{box-shadow:0 0 0 7px var(--stop-soft)}}
+
+.fs-body{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:14px;align-items:start}
+.fs-card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:18px;display:grid;gap:11px;align-content:start;min-width:0;min-height:356px}
+.fs-card.stop{box-shadow:inset 4px 0 0 var(--stop)}
+.fs-card.swap{animation:fs-in .35s ease}
+@keyframes fs-in{from{opacity:.25;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fs-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;align-items:baseline}
+.fs-step{font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
+.fs-card h3{font-family:var(--display);font-size:1.3rem;font-weight:700;line-height:1.15;margin:0}
+.fs-who{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.fs-chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.74rem;font-weight:500;border-radius:5px;padding:2px 7px;white-space:nowrap;border:1px solid transparent;transition:opacity .3s,box-shadow .3s}
+.fs-chip.opus{color:var(--opus);background:var(--opus-soft)}
+.fs-chip.sonnet{color:var(--sonnet);background:var(--sonnet-soft)}
+.fs-chip.haiku{color:var(--haiku);background:var(--haiku-soft)}
+.fs-chip.main{color:var(--muted);background:var(--sunk);border-color:var(--rule)}
+.fs-chip.par{color:var(--accent);background:var(--accent-soft)}
+.fs-desc{font-size:.95rem;color:var(--ink);max-width:62ch;margin:0}
+.fs-mark{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.72rem;font-weight:500;color:var(--stop);white-space:nowrap}
+.fs-mark::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--stop);transform:rotate(45deg)}
+.fs-meter{display:grid;gap:8px;background:var(--sunk);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;font-size:.86rem;min-width:0}
+.fs-meter[hidden]{display:none}
+.fs-seq{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.fs-seq .fs-chip{opacity:.38}
+.fs-seq .fs-chip.on{opacity:1}
+.fs-seq .arrow{color:var(--faint);font-family:var(--mono);font-size:.8rem}
+.fs-dots{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+.fs-dots i{width:12px;height:12px;border-radius:3px;border:1.5px solid var(--accent);background:transparent;transition:background .25s}
+.fs-dots i.on{background:var(--accent)}
+.fs-result{font-family:var(--mono);font-size:.8rem;color:var(--ink);word-break:break-word}
+.fs-result[hidden]{display:none}
+.fs-bars{display:grid;gap:7px}
+.fs-bar{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:10px;align-items:center}
+.fs-bar b{display:block;height:8px;border-radius:4px;background:var(--surface);border:1px solid var(--rule);overflow:hidden;position:relative}
+.fs-bar b::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w,0%);background:var(--accent);transition:width var(--t,1.6s) ease}
+.fs-count{font-family:var(--display);font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.fs-count small{font-family:var(--mono);font-size:.74rem;font-weight:500;color:var(--muted);margin-left:6px}
+.fs-dl{margin:0;display:grid;grid-template-columns:96px minmax(0,1fr);gap:7px 12px;font-size:.88rem;align-items:baseline}
+.fs-dl dt{font-family:var(--mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+.fs-dl dd{margin:0;color:var(--muted);min-width:0}
+.fs-files{display:flex;flex-wrap:wrap;gap:4px 8px}
+.fs-files code{font-family:var(--mono);font-size:.78rem;background:var(--sunk);border:1px solid var(--rule);border-radius:4px;padding:.05em .35em;white-space:nowrap;color:var(--ink)}
+.fs-you{display:grid;gap:4px;background:var(--you-soft);border-radius:8px;padding:10px 12px;font-size:.9rem;color:var(--ink)}
+.fs-you .lbl{font-family:var(--mono);font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--you)}
+.fs-card.stop .fs-you{background:var(--stop-soft)}
+.fs-card.stop .fs-you .lbl{color:var(--stop)}
+.fs-wait{font-family:var(--mono);font-size:.78rem;color:var(--stop)}
+.fs-wait[hidden]{display:none}
+
+.fs-side{display:grid;gap:12px;min-width:0}
+.fs-log{margin:0;background:var(--term);color:var(--term-ink);border-radius:10px;border:1px solid var(--term-rule);font-family:var(--mono);font-size:.78rem;line-height:1.55;overflow:hidden;min-width:0}
+.fs-log .head{display:flex;justify-content:space-between;gap:10px;padding:8px 13px;border-bottom:1px solid var(--term-rule);color:var(--term-dim);font-size:.7rem;letter-spacing:.05em;text-transform:uppercase}
+.fs-log ol{list-style:none;margin:0;padding:10px 13px 12px;display:grid;gap:4px;height:236px;overflow:auto;align-content:start;scroll-behavior:smooth}
+.fs-log li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:6px;word-break:break-word}
+.fs-log li.in{animation:fs-type .35s ease}
+@keyframes fs-type{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:none}}
+.fs-log .m{color:var(--term-dim)}
+.fs-log .you{color:var(--term-accent)}
+.fs-log .stop{color:var(--term-stop)}
+.fs-log .dim{color:var(--term-dim)}
+.fs-tree{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:10px 13px;font-family:var(--mono);font-size:.76rem;line-height:1.6;min-width:0}
+.fs-tree .t{color:var(--faint);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.fs-tree ul{list-style:none;margin:0;padding:0;display:grid;gap:1px;max-height:150px;overflow:auto}
+.fs-tree li{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs-tree li.fs-new{color:var(--accent);font-weight:500}
+.fs-tree li.in{animation:fs-type .35s ease}
+
+.fs-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.fs-btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--display);font-weight:700;font-size:.92rem;border-radius:8px;padding:8px 13px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer}
+.fs-btn:hover{border-color:var(--accent)}
+.fs-btn:disabled{opacity:.45;cursor:default;border-color:var(--rule)}
+.fs-btn.play{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);min-width:132px;justify-content:center}
+.fs-btn.play:hover{filter:brightness(1.08)}
+.fs-pos{margin-left:auto;font-family:var(--mono);font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.fs-done{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:.9rem;background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:10px 13px}
+.fs-done[hidden]{display:none}
+.fs-done b{font-family:var(--display)}
+
+/* Selector de comando */
+.ft{display:grid;gap:14px;min-width:0}
+.ft-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ft-tab{display:grid;gap:3px;justify-items:start;align-content:start;text-align:left;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--muted);font:inherit;min-width:0;transition:border-color .2s,background .2s}
+.ft-tab code{font-family:var(--mono);font-size:.98rem;font-weight:600;color:var(--ink);background:none;border:0;padding:0;white-space:nowrap}
+.ft-tab span{font-size:.84rem;line-height:1.3;color:var(--ink)}
+.ft-tab small{font-family:var(--mono);font-size:.7rem;letter-spacing:.02em;color:var(--faint)}
+.ft-tab:hover{border-color:var(--accent)}
+.ft-tab[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 -3px 0 var(--accent)}
+.ft-tab[aria-selected="true"] code{color:var(--accent)}
+.ft-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ft-panel{display:grid;gap:12px;min-width:0}
+.ft-note{margin:0;font-size:.9rem;color:var(--muted);max-width:72ch}
+.ft-note code{font-family:var(--mono);font-size:.84em}
+
+@media (max-width:860px){
+  .fs-body{grid-template-columns:minmax(0,1fr)}
+  .fs-card{min-height:0}
+}
+@media (max-width:640px){
+  .fs-node .fs-lab{display:none}
+  .fs-dot{width:24px;height:24px;font-size:.66rem}
+  .fs-rail::before,.fs-fill{top:17px}
+  .fs-dl{grid-template-columns:minmax(0,1fr);gap:2px}
+  .fs-dl dd{margin-bottom:6px}
+  .fs-bar{grid-template-columns:minmax(0,1fr)}
+  .fs-pos{margin-left:0;width:100%}
+  .ft-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){
+  .fs-fill,.fs-dot,.fs-chip,.fs-dots i,.fs-bar b::after,.ft-tab{transition:none!important}
+  .fs-card.swap,.fs-log li.in,.fs-tree li.in,.fs.playing .fs-node.now .fs-dot{animation:none!important}
+  .fs-log ol{scroll-behavior:auto}
+}
+/* FS-CSS:END */
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <span class="brand"><i aria-hidden="true"></i>hu-flow</span>
+    <span class="by"><a href="/">← Agustín Rodriguez</a> · Senior Full Stack Engineer</span>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow">AI agent workflow · Claude Code</span>
+    <h1>From user story to merge-ready branch, with a human at <em>every checkpoint</em>.</h1>
+    <p class="lead">hu-flow is a workflow of 12 Claude Code agents for day-to-day product work. It reads an Azure DevOps user story, asks what is missing, plans, writes the code and the tests, verifies every acceptance criterion in a real browser or against the API, and runs code, security and vulnerability reviews. The developer approves every checkpoint and nothing is pushed without their word.</p>
+    <div class="facts">
+      <div class="fact"><b>12</b><span>agents</span></div>
+      <div class="fact"><b>4</b><span>human checkpoints</span></div>
+      <div class="fact"><b>693</b><span>automated tests of the workflow</span></div>
+      <div class="fact"><b>0</b><span>automatic merges</span></div>
+    </div>
+  </header>
+
+  <section class="sim" aria-labelledby="sim-title">
+    <div class="sim-head">
+      <h2 id="sim-title">Watch each command run</h2>
+      <div class="legend"><span class="ok">agent step</span><span class="st">human checkpoint</span></div>
+    </div>
+    <div id="fs-hu"></div>
+  </section>
+
+  <div class="notes">
+    <div class="note st">
+      <h3>Guardrails, not good intentions</h3>
+      <ul>
+        <li>Hooks check every command before it runs. Merges, rebases, force pushes, files outside the approved plan and traffic outside localhost are blocked.</li>
+        <li>Nothing is pushed until the developer types <code>push</code>.</li>
+        <li>Agents never touch git or publish anything; the session does, with approval.</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>Verified before it says “done”</h3>
+      <ul>
+        <li>Every acceptance criterion and every Figma flow is checked on the final code, measured to ±1 px.</li>
+        <li>APIs get real calls to every endpoint, including without a session and with a role that should be denied.</li>
+        <li>If anything changes after that, the whole pass runs again.</li>
+      </ul>
+    </div>
+    <div class="note">
+      <h3>Measured, not guessed</h3>
+      <ul>
+        <li>Used on 4 user stories and 5 bug fixes in production work.</li>
+        <li>A token-cost analysis of 6,776 model calls showed that 64% of the spend was re-sent context, which led to shorter verification batches.</li>
+        <li>The code is private; this page shows how it works.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <span>hu-flow · Claude Code agents, hooks, skills and MCP</span>
+    <span><a href="/">agustin-1998.github.io</a> · <a href="https://www.linkedin.com/in/agustinrodriguez98" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://github.com/agustin-1998" target="_blank" rel="noopener">GitHub</a></span>
+  </footer>
+</div>
+
+<script>
+/* FS-JS:BEGIN */
+function FlowSim(root, cfg) {
+  var S = cfg.steps, L = cfg.labels, N = S.length;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var i = 0, playing = false, timers = [], finished = false;
+
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function chip(c) { return '<span class="fs-chip ' + c[0] + '">' + esc(c[1]) + '</span>'; }
+
+  root.classList.add('fs');
+  root.style.setProperty('--fs-n', N);
+  root.innerHTML =
+    '<div class="fs-rail" role="group" aria-label="' + esc(L.rail) + '"><span class="fs-fill" aria-hidden="true"></span></div>' +
+    '<div class="fs-body">' +
+      '<article class="fs-card" aria-live="polite"></article>' +
+      '<aside class="fs-side">' +
+        '<figure class="fs-log" aria-label="' + esc(L.logAria) + '"><div class="head"><span>' + esc(L.logHead) + '</span><span>' + esc(L.logSide) + '</span></div><ol></ol></figure>' +
+        '<div class="fs-tree"><div class="t">' + esc(L.treeHead) + '</div><ul></ul></div>' +
+      '</aside>' +
+    '</div>' +
+    '<div class="fs-done" hidden></div>' +
+    '<div class="fs-controls">' +
+      '<button type="button" class="fs-btn prev" aria-label="' + esc(L.prev) + '">←</button>' +
+      '<button type="button" class="fs-btn play">▶ ' + esc(L.play) + '</button>' +
+      '<button type="button" class="fs-btn next" aria-label="' + esc(L.next) + '">→</button>' +
+      '<button type="button" class="fs-btn restart">↺ ' + esc(L.restart) + '</button>' +
+      '<span class="fs-pos"></span>' +
+    '</div>';
+
+  var rail = root.querySelector('.fs-rail'), fill = root.querySelector('.fs-fill');
+  var card = root.querySelector('.fs-card'), log = root.querySelector('.fs-log ol'), tree = root.querySelector('.fs-tree ul');
+  var done = root.querySelector('.fs-done'), pos = root.querySelector('.fs-pos');
+  var bPrev = root.querySelector('.prev'), bPlay = root.querySelector('.play'), bNext = root.querySelector('.next'), bRestart = root.querySelector('.restart');
+
+  var nodes = S.map(function (s, k) {
+    var b = el('button', 'fs-node' + (s.kind === 'stop' ? ' stop' : ''));
+    b.type = 'button';
+    b.setAttribute('aria-label', L.stepWord + ' ' + s.n + ': ' + s.title);
+    b.innerHTML = '<span class="fs-dot"><span>' + esc(s.n) + '</span></span><span class="fs-lab">' + esc(s.short) + '</span>';
+    b.addEventListener('click', function () { stop(); go(k, false); });
+    rail.appendChild(b);
+    return b;
+  });
+
+  function later(ms, fn) { timers.push(setTimeout(fn, ms)); }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  /* Las líneas de la sesión hasta el paso k. Si answered, incluye la respuesta del paso k. */
+  function linesUpTo(k, answered) {
+    var out = [];
+    for (var j = 0; j <= k; j++) {
+      var s = S[j];
+      (s.log || []).forEach(function (l) { out.push(l); });
+      if (s.prompt) out.push({ m: s.kind === 'stop' ? '◆' : '?', c: s.kind === 'stop' ? 'stop' : '', t: s.prompt });
+      if ((j < k || answered) && s.reply) out.push({ m: '›', c: 'you', t: s.reply });
+      if ((j < k || answered) && s.after) s.after.forEach(function (l) { out.push(l); });
+    }
+    return out;
+  }
+  function lineHTML(l) {
+    var head = l.c === 'you' ? 'you' : (l.c === 'stop' ? 'stop' : 'm');
+    var body = '<span class="' + (l.c || '') + '">' + esc(l.t) + (l.d ? ' <span class="dim">' + esc(l.d) + '</span>' : '') + '</span>';
+    return '<span class="' + head + '">' + esc(l.m || '·') + '</span>' + body;
+  }
+  function renderLog(k, answered, animateFrom) {
+    var lines = linesUpTo(k, answered);
+    log.innerHTML = '';
+    lines.forEach(function (l, idx) {
+      var li = el('li', idx >= animateFrom ? 'in' : '', lineHTML(l));
+      log.appendChild(li);
+    });
+    log.scrollTop = log.scrollHeight;
+    return lines.length;
+  }
+  var shownLines = 0;
+
+  function renderTree(k, animate) {
+    tree.innerHTML = '';
+    var seen = {};
+    for (var j = 0; j <= k; j++) {
+      (S[j].files || []).forEach(function (f) {
+        if (seen[f]) return; seen[f] = 1;
+        var li = el('li', (j === k ? 'fs-new' : '') + (j === k && animate ? ' in' : ''));
+        li.textContent = f;
+        tree.appendChild(li);
+      });
+    }
+    if (!tree.children.length) { var e0 = el('li', ''); e0.textContent = L.treeEmpty; tree.appendChild(e0); }
+    tree.scrollTop = tree.scrollHeight;
+  }
+
+  function meterHTML(s) {
+    var m = s.meter; if (!m) return '';
+    if (m.type === 'count') {
+      return '<div class="fs-meter"><div class="fs-count"><span class="fs-v">' + m.to + '</span><small>/ ' + m.to + ' ' + esc(m.label) + '</small></div></div>';
+    }
+    if (m.type === 'seq') {
+      var seq = m.items.map(function (c, idx) { return (idx ? '<span class="arrow">→</span>' : '') + chip(c).replace('fs-chip', 'fs-chip on'); }).join('');
+      var dots = ''; for (var d = 0; d < (m.tandas || 0); d++) dots += '<i class="on"></i>';
+      return '<div class="fs-meter"><div class="fs-seq">' + seq + '</div>' + (dots ? '<div class="fs-dots"><span>' + esc(m.tandasLabel) + '</span>' + dots + '</div>' : '') + '<div class="fs-result">' + esc(m.result) + '</div></div>';
+    }
+    if (m.type === 'par') {
+      return '<div class="fs-meter"><div class="fs-bars">' + m.items.map(function (c) {
+        return '<div class="fs-bar">' + chip(c) + '<b style="--w:100%"></b></div>';
+      }).join('') + '</div></div>';
+    }
+    return '';
+  }
+
+  function renderCard(s, k, waiting) {
+    card.className = 'fs-card' + (s.kind === 'stop' ? ' stop' : '') + (reduce ? '' : ' swap');
+    var head = '<div class="fs-head"><span class="fs-step">' + esc(L.stepWord) + ' ' + esc(s.n) + ' ' + esc(L.of) + ' ' + N + '</span>' + (s.mark ? '<span class="fs-mark">' + esc(s.mark) + '</span>' : '') + '</div>';
+    var dl = '<dl class="fs-dl">' +
+      (s.files && s.files.length ? '<dt>' + esc(L.leaves) + '</dt><dd class="fs-files">' + s.files.map(function (f) { return '<code>' + esc(f) + '</code>'; }).join('') + '</dd>' : '') +
+      '</dl>';
+    var you = '<div class="fs-you"><span class="lbl">' + esc(s.kind === 'stop' ? L.yourTurn : L.you) + '</span><span>' + esc(s.you) + '</span>' +
+      (s.kind === 'stop' ? '<span class="fs-wait"' + (waiting ? '' : ' hidden') + '>' + esc(L.waiting) + '</span>' : '') + '</div>';
+    card.innerHTML = head + '<h3>' + esc(s.title) + '</h3><div class="fs-who">' + s.who.map(chip).join('') + '</div><p class="fs-desc">' + esc(s.desc) + '</p>' + meterHTML(s) + dl + you;
+    void card.offsetWidth;
+  }
+
+  function renderNodes(k) {
+    nodes.forEach(function (b, j) {
+      b.classList.toggle('done', j < k);
+      b.classList.toggle('now', j === k);
+      if (j === k) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    fill.style.width = 'calc(' + (k / (N - 1)) + ' * (100% - 100% / ' + N + '))';
+    pos.textContent = L.stepWord + ' ' + S[k].n + ' ' + L.of + ' ' + N;
+    bPrev.disabled = k === 0;
+    bNext.disabled = k === N - 1 && finished;
+  }
+
+  /* Ir a un paso. En reposo, el paso se muestra completo; un punto de control queda esperando tu respuesta. */
+  function go(k, animated) {
+    i = k; finished = false; done.hidden = true;
+    renderNodes(k);
+    renderCard(S[k], k, S[k].kind === 'stop' && !animated);
+    var before = animated ? shownLines : 1e9;
+    shownLines = renderLog(k, false, before);
+    renderTree(k, animated);
+    card.setAttribute('aria-live', playing ? 'off' : 'polite');
+  }
+
+  /* Animación del medidor del paso actual durante la reproducción. */
+  function animateMeter(s, total) {
+    var m = s.meter; if (!m || reduce) return;
+    if (m.type === 'count') {
+      var v = card.querySelector('.fs-count .fs-v'); var n = 0; v.textContent = '0';
+      var steps = Math.ceil(m.to / m.step), dt = total / (steps + 1);
+      for (var t = 1; t <= steps; t++) (function (t) { later(dt * t, function () { v.textContent = Math.min(m.to, t * m.step); }); })(t);
+    }
+    if (m.type === 'seq') {
+      var chips = card.querySelectorAll('.fs-seq .fs-chip'), dots = card.querySelectorAll('.fs-dots i'), res = card.querySelector('.fs-result');
+      chips.forEach(function (c) { c.classList.remove('on'); }); dots.forEach(function (d) { d.classList.remove('on'); }); res.hidden = true;
+      var unit = total / (chips.length + dots.length + 1.5);
+      chips.forEach(function (c, idx) { later(unit * idx + 150, function () { c.classList.add('on'); }); });
+      dots.forEach(function (d, idx) { later(unit * (chips.length + idx), function () { d.classList.add('on'); }); });
+      later(unit * (chips.length + dots.length) + 120, function () { res.hidden = false; });
+    }
+    if (m.type === 'par') {
+      var bars = card.querySelectorAll('.fs-bar b');
+      bars.forEach(function (b) { b.style.setProperty('--t', '0s'); b.style.setProperty('--w', '0%'); });
+      void card.offsetWidth;
+      var speeds = [0.95, 0.7, 0.5];
+      bars.forEach(function (b, idx) { b.style.setProperty('--t', (total * speeds[idx % 3] / 1000) + 's'); later(60, function () { b.style.setProperty('--w', '100%'); }); });
+    }
+  }
+
+  function step() {
+    var s = S[i], dwell = s.dwell || 2600;
+    animateMeter(s, s.kind === 'stop' && s.meter && s.meter.type === 'count' ? (s.wait || 2400) : dwell * 0.85);
+    if (s.prompt) {
+      later(s.kind === 'stop' ? 900 : dwell * 0.6, function () {
+        var w = card.querySelector('.fs-wait'); if (w) w.hidden = false;
+        later(s.wait || 1900, function () {
+          shownLines = renderLog(i, true, shownLines);
+          if (w) w.hidden = true;
+          later(1100, advance);
+        });
+      });
+    } else {
+      later(dwell, advance);
+    }
+  }
+  function advance() {
+    if (!playing) return;
+    if (i < N - 1) { go(i + 1, true); step(); }
+    else finish();
+  }
+  function finish() {
+    playing = false; finished = true; root.classList.remove('playing');
+    shownLines = renderLog(i, true, shownLines);
+    nodes[i].classList.add('done');
+    done.innerHTML = cfg.doneHTML; done.hidden = false;
+    bPlay.innerHTML = '▶ ' + esc(L.replay);
+    renderNodes(i); nodes[i].classList.add('done');
+  }
+  function play() {
+    var fresh = finished || i === 0;
+    playing = true; root.classList.add('playing');
+    bPlay.innerHTML = '❚❚ ' + esc(L.pause);
+    if (fresh) { shownLines = 0; go(0, true); }
+    else { go(i, true); }
+    step();
+  }
+  function stop() {
+    if (!playing) return;
+    playing = false; clearTimers(); root.classList.remove('playing');
+    bPlay.innerHTML = '▶ ' + esc(L.resume);
+    card.setAttribute('aria-live', 'polite');
+  }
+
+  bPlay.addEventListener('click', function () { if (playing) stop(); else { clearTimers(); play(); } });
+  bPrev.addEventListener('click', function () { stop(); if (i > 0) go(i - 1, false); });
+  bNext.addEventListener('click', function () { stop(); if (i < N - 1) go(i + 1, false); else if (!finished) finish(); });
+  bRestart.addEventListener('click', function () { stop(); clearTimers(); bPlay.innerHTML = '▶ ' + esc(L.play); go(0, false); });
+  root.addEventListener('keydown', function (e) {
+    if (e.target.closest('input,textarea')) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); bNext.click(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); bPrev.click(); }
+  });
+
+  go(0, false);
+  return { destroy: function () { playing = false; clearTimers(); } };
+}
+
+/* Selector de comando: una pestaña por comando, cada una con su propio recorrido.
+   Los datos de cada comando viven aparte (HF_CMDS), así que un cambio en el flujo se corrige solo ahí. */
+function FlowTabs(root, cmds, opts) {
+  var inst = null, cur = -1, key = 'hf-cmd';
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  root.classList.add('ft');
+  root.innerHTML = '<div class="ft-tabs" role="tablist" aria-label="' + esc(opts.aria) + '"></div><div class="ft-panel" role="tabpanel" id="ft-panel"></div>';
+  var bar = root.querySelector('.ft-tabs'), panel = root.querySelector('.ft-panel');
+  var tabs = cmds.map(function (c, k) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'ft-tab'; b.id = 'ft-tab-' + c.id;
+    b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'ft-panel');
+    b.innerHTML = '<code>' + esc(c.label) + '</code><span>' + esc(c.sub) + '</span>' + (c.steps ? '<small>' + esc(c.steps) + '</small>' : '');
+    b.addEventListener('click', function () { select(k); });
+    bar.appendChild(b);
+    return b;
+  });
+  bar.addEventListener('keydown', function (e) {
+    var k = cur;
+    if (e.key === 'ArrowRight') k = (cur + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft') k = (cur - 1 + tabs.length) % tabs.length;
+    else if (e.key === 'Home') k = 0;
+    else if (e.key === 'End') k = tabs.length - 1;
+    else return;
+    e.preventDefault(); select(k); tabs[k].focus();
+  });
+  function select(k) {
+    if (k === cur) return;
+    if (inst) inst.destroy();
+    cur = k;
+    tabs.forEach(function (b, j) { b.setAttribute('aria-selected', j === k ? 'true' : 'false'); b.tabIndex = j === k ? 0 : -1; });
+    panel.setAttribute('aria-labelledby', tabs[k].id);
+    panel.innerHTML = '';
+    if (cmds[k].note) { var n = document.createElement('p'); n.className = 'ft-note'; n.innerHTML = cmds[k].note; panel.appendChild(n); }
+    var host = document.createElement('div'); panel.appendChild(host);
+    inst = FlowSim(host, cmds[k].cfg);
+    try { localStorage.setItem(key, cmds[k].id); } catch (e) {}
+  }
+  var start = 0;
+  try { var saved = localStorage.getItem(key); cmds.forEach(function (c, k) { if (c.id === saved) start = k; }); } catch (e) {}
+  select(start);
+}
+
+/* One walkthrough per command. Each command lives in its own file: when the workflow changes, edit that file and rebuild the page (build.py). */
+var HF_CMDS = [];
+var HF_LABELS = {
+  logAria: 'Simulated Claude Code session', logSide: 'Claude Code',
+  treeHead: 'Files written to ~/.hu-flow', treeEmpty: 'nothing yet',
+  prev: 'Previous step', next: 'Next step', play: 'Play', pause: 'Pause', resume: 'Resume', replay: 'Play again', restart: 'From the start',
+  stepWord: 'Step', of: 'of', leaves: 'Writes', you: 'The developer', yourTurn: 'Your turn', waiting: 'waiting for your answer…'
+};
+function hfCmd(o) {
+  var L = {}, k;
+  for (k in HF_LABELS) L[k] = HF_LABELS[k];
+  for (k in o.labels) L[k] = o.labels[k];
+  HF_CMDS.push({ id: o.id, label: o.label, sub: o.sub, steps: o.stepsNote, note: o.note, cfg: { labels: L, doneHTML: o.doneHTML, steps: o.steps } });
+}
+
+hfCmd({
+  id: 'hu', label: '/hu <id>', sub: 'User story', stepsNote: '11 steps · 4 checkpoints',
+  note: 'A simulated user story, from reading the ticket to a pushed <code>feature/</code> branch.',
+  labels: { rail: 'Steps of /hu', logHead: 'Example run · one user story' },
+  doneHTML: '<b>Pushed.</b><span>The branch is on GitLab with a ready-to-open merge request link. Merging, deploying and QA stay with the developer.</span>',
+  steps: [
+    { n: '1', short: 'Story', title: 'Read the user story', who: [['haiku', 'hu-reader']],
+      desc: 'Pulls the story from Azure DevOps (read-only), downloads its images and turns it into numbered acceptance criteria, data with their source, gaps, and the repos it seems to touch.',
+      files: ['hu/US-1042/story.md', 'hu/US-1042/spec.md'], you: 'Reads a five-line summary.',
+      log: [{ m: '›', c: 'you', t: '/hu 1042' }, { t: 'hu-reader', d: '16 acceptance criteria' }] },
+    { n: '2', short: 'Scope', title: 'Scope and branches', who: [['main', 'session']],
+      desc: 'Matches the story against a search of each repo’s code and proposes which repos it belongs to, with the evidence. It never starts on its own.',
+      files: ['hu/US-1042/decisions.md'], you: 'Confirms the repos, the base branch and the branch name.',
+      prompt: 'Which repos does it touch?', reply: '● both portals', wait: 1300 },
+    { n: '3', short: 'Profile', title: 'Repo profile', who: [['sonnet', 'project-scout']],
+      desc: 'Only when missing or when the manifest changed: stack, structure, style, API layer, model files to imitate, exact commands and a map of the codebase.',
+      files: ['admin-portal/project-profile.md'], you: 'Nothing.', dwell: 2000,
+      log: [{ t: 'project-scout', d: 'only if missing or the manifest changed' }] },
+    { n: '4', short: 'Branch', title: 'Prepare branches', who: [['main', 'session']],
+      desc: 'Checks out the base, pulls and creates the branch. A hook approves it automatically only if the name follows the convention and the base is allowed.',
+      files: [], you: 'Nothing, unless there are uncommitted changes.', dwell: 2000,
+      log: [{ t: 'git checkout -b feature/US-1042-…', d: 'guardrail ✓' }] },
+    { n: '5', short: 'Design', title: 'Design', who: [['main', 'session'], ['sonnet', 'design-reader']],
+      desc: 'Orders the exported Figma frames and maps every screen to components that already exist, with exact copy, missing states and measurements.',
+      files: ['hu/US-1042/screens/', 'hu/US-1042/design.md'], you: 'Exports the Figma frames (PNG 2x).',
+      log: [{ t: 'design-reader', d: '13 frames → measurements' }] },
+    { n: '6', short: 'Questions', kind: 'stop', mark: 'you answer', title: 'Questions', who: [['opus', 'planner · pass 1']],
+      desc: 'Cross-checks story, design, repo profile and code. Anything undefined becomes a question with options and a recommended one: data source, errors, states, navigation.',
+      meter: { type: 'count', to: 39, step: 4, label: 'questions answered, four at a time' },
+      files: ['hu/US-1042/questions.md'], you: 'Answers four at a time, picking an option or writing their own.',
+      prompt: '39 questions for you, four at a time', reply: '39 answered', wait: 2600 },
+    { n: '7', short: 'Plan', kind: 'stop', mark: 'you approve', title: 'Plan', who: [['opus', 'planner · pass 2']],
+      desc: 'One plan per repo: estimated tasks, the files it may touch (a contract the guardrails enforce), tests and a verification route. Plus a one-page summary for the team.',
+      files: ['admin-portal/US-1042/plan.md', 'merchant-portal/US-1042/plan.md', 'hu/US-1042/summary.md'], you: 'Approves, adjusts or cancels. No approval, no code.',
+      prompt: 'Plan: admin 11 h · merchant 10.5 h · approve?', reply: 'approve', wait: 1800 },
+    { n: '8', short: 'Build', title: 'Build and verify', who: [['sonnet', 'implementer'], ['sonnet', 'test-writer'], ['sonnet', 'visual-qa']],
+      desc: 'Code task by task, unit tests, then short batches in a real browser against the local Docker stack, measuring against Figma. Failures go back to the implementer, at most 3 cycles. For an API, api-qa makes real calls, including without a session and with the wrong role.',
+      meter: { type: 'seq', items: [['sonnet', 'implementer'], ['sonnet', 'test-writer'], ['sonnet', 'visual-qa']], tandas: 4, tandasLabel: 'batches', result: 'merchant portal: AC ✅ 15 · ⚠️ 1 not verifiable in a browser' },
+      files: ['merchant-portal/US-1042/batches/', 'merchant-portal/US-1042/visual.md'], you: 'Nothing: test users log in by themselves.', dwell: 4200,
+      log: [{ t: 'implementer → test-writer → visual-qa' }, { m: ' ', t: '', d: 'merchant portal: AC ✅ 15 · ⚠️ 1 not verifiable in a browser' }] },
+    { n: '9', short: 'Review', title: 'Review', who: [['opus', 'reviewer'], ['opus', 'security-reviewer'], ['sonnet', 'vuln-scanner'], ['par', 'in parallel']],
+      desc: 'Acceptance criteria, plan and conventions; a security review with the repo’s checklist; Trivy in Docker, like the merge request pipeline. Blockers go back to the implementer, at most 2 cycles.',
+      meter: { type: 'par', items: [['opus', 'reviewer'], ['opus', 'security-reviewer'], ['sonnet', 'vuln-scanner']] },
+      files: ['merchant-portal/US-1042/review.md', 'merchant-portal/US-1042/security.md', 'merchant-portal/US-1042/vulns.md'], you: 'Nothing, unless there are new vulnerabilities or secrets.', dwell: 3000,
+      log: [{ t: 'reviewer · security · trivy', d: 'in parallel' }] },
+    { n: '10', short: 'Ready', kind: 'stop', mark: 'you test and decide', title: '“Story ready”', who: [['main', 'session']],
+      desc: 'An acceptance-criteria matrix per repo with evidence, then what changed, how to test it locally, data created and the commit message.',
+      files: ['hu/US-1042/status.md'], you: 'Reviews the diff, tests locally, asks for changes or types “push”.',
+      prompt: 'Story ready: AC and flow matrix', reply: 'push', wait: 1700 },
+    { n: '11', short: 'Push', kind: 'stop', mark: 'you confirm', title: 'Commit and push', who: [['main', 'session']],
+      desc: 'Stages file by file (only planned files), commits with the confirmed message and pushes the branch. A guardrail checks for unplanned files and asks before pushing.',
+      files: [], you: 'Confirms the push. Merge request, merge, deploy and QA stay human.',
+      prompt: 'guardrail: planned files only ✓ · push?', reply: 'yes', wait: 1300,
+      after: [{ t: 'push → merge request link', c: 'dim' }] }
+  ]
+});
+
+hfCmd({
+  id: 'bug', label: '/bug <id>', sub: 'Fix a bug', stepsNote: '11 steps · 4 checkpoints',
+  note: 'A simulated bug. It reuses everything /hu shares and changes the core: reproduce, find the cause, write a failing test, apply the smallest fix, run a scoped regression. New <code>fix/</code> branch.',
+  labels: { rail: 'Steps of /bug', logHead: 'Example run · one bug' },
+  doneHTML: '<b>Pushed.</b><span>A fix/ branch with the bug reproduced, fixed and covered by a test. Review comments on its merge request go through /hu-fix.</span>',
+  steps: [
+    { n: '1', short: 'Bug', title: 'Read the bug', who: [['haiku', 'hu-reader · bug mode']],
+      desc: 'Builds the bug section: steps to reproduce, expected, actual and where it was seen, and turns it into acceptance criterion AC-1 (“given… when… then <expected>”). Notes the linked story. If the expected behavior is not written down, it does not invent it; real personal data is never copied.',
+      files: ['hu/BUG-2087/story.md', 'hu/BUG-2087/spec.md'], you: 'If the linked story never went through the workflow, chooses whether to bring its criteria into the regression.',
+      log: [{ m: '›', c: 'you', t: '/bug 2087' }, { t: 'hu-reader · bug mode', d: 'AC-1 · linked story' }] },
+    { n: '2', short: 'Scope', title: 'Scope and branch', who: [['main', 'session']],
+      desc: 'Same as /hu, with two changes: it proposes which repo the bug lives in (a portal or the backend) and asks whether another one needs the same fix.',
+      files: ['hu/BUG-2087/decisions.md'], you: 'Confirms the repo, the base branch and the fix/ branch name.',
+      prompt: 'Which repo has the bug?', reply: '● merchant portal', wait: 1300 },
+    { n: '3', short: 'Profile', title: 'Repo profile', who: [['sonnet', 'project-scout']],
+      desc: 'Only when missing or when the manifest changed: stack, structure, style, API layer, model files and exact commands.',
+      files: ['merchant-portal/project-profile.md'], you: 'Nothing.', dwell: 2000,
+      log: [{ t: 'project-scout', d: 'only if missing or the manifest changed' }] },
+    { n: '4', short: 'Branch', title: 'Prepare the branch', who: [['main', 'session']],
+      desc: 'Checks out the base, pulls and creates the fix/ branch. A hook approves it only if the name follows the convention.',
+      files: [], you: 'Nothing, unless there are uncommitted changes.', dwell: 2000,
+      log: [{ t: 'git checkout -b fix/BUG-2087-…', d: 'guardrail ✓' }] },
+    { n: '5', short: 'Reproduce', title: 'Reproduce before touching code', who: [['sonnet', 'visual-qa · reproduce']],
+      desc: 'Follows the bug’s steps against the local Docker stack, with console and network open, and takes “before” screenshots. If it cannot reproduce it, it stops. If the frontend renders what it receives and the API is wrong, it stops with the evidence and offers to fix it in the backend. For an API-only repo, api-qa reproduces it with the real call.',
+      files: ['merchant-portal/BUG-2087/reproduction.md', 'merchant-portal/BUG-2087/visual/00-before-….png'], you: 'Provides data if asked. Test users log in by themselves.', dwell: 3000,
+      log: [{ t: 'visual-qa · reproduce', d: 'REPRODUCED: actual behavior seen' }] },
+    { n: '6', short: 'Diagnosis', kind: 'stop', mark: 'you approve', title: 'Diagnosis and questions', who: [['opus', 'planner · bug mode']],
+      desc: 'The cause with file and line, since when (which commit and which story introduced it), where else the code is used, whether the other portal has the same problem, and the proposed fix. It only asks what the diagnosis cannot answer.',
+      files: ['hu/BUG-2087/diagnosis.md', 'hu/BUG-2087/questions.md'], you: 'Approves the diagnosis. Even with no open questions, nothing is planned without approval.',
+      prompt: 'Diagnosis: cause, since when, where else it’s used · approve?', reply: 'approve', wait: 1800 },
+    { n: '7', short: 'Plan', kind: 'stop', mark: 'you approve', title: 'Plan', who: [['opus', 'planner · bug mode']],
+      desc: 'The cause; T0, a test that reproduces the bug; the smallest fix, with no refactors along the way; and the regression scope: the linked story’s criteria, the affected screens and whether the bug is visual.',
+      files: ['merchant-portal/BUG-2087/plan.md'], you: 'Approves, adjusts or cancels.',
+      prompt: 'Plan: T0 + smallest fix + regression · approve?', reply: 'approve', wait: 1600 },
+    { n: '8', short: 'Red→green', title: 'Red → fix → green → QA', who: [['sonnet', 'test-writer'], ['sonnet', 'implementer'], ['sonnet', 'visual-qa · bug mode']],
+      desc: 'The test must fail because of the bug. implementer fixes it, and both the new test and the existing specs must pass. visual-qa verifies the fix with “after” screenshots, the linked story’s criteria and the affected screens. Design measurements only when the bug is visual.',
+      meter: { type: 'seq', items: [['sonnet', 'test-writer'], ['sonnet', 'implementer'], ['sonnet', 'visual-qa']], result: 'test red → green ✅ · bug fixed ✅ · regression ✅' },
+      files: ['merchant-portal/BUG-2087/visual.md'], you: 'Nothing.', dwell: 3800,
+      log: [{ t: 'test-writer → implementer → visual-qa' }, { m: ' ', t: '', d: 'test red → green · before / after screenshots' }] },
+    { n: '9', short: 'Review', title: 'Review', who: [['opus', 'reviewer · bug mode'], ['opus', 'security-reviewer'], ['sonnet', 'vuln-scanner']],
+      desc: 'On top of the usual checks, the reviewer makes sure the fix addresses the cause and does not hide the symptom (a v-if that hides the error is a blocker), that the change is minimal and that the test asserts the expected behavior. Security only if the fix touches logic; Trivy only if it touches dependencies or the Dockerfile.',
+      meter: { type: 'par', items: [['opus', 'reviewer'], ['opus', 'security-reviewer'], ['sonnet', 'vuln-scanner']] },
+      files: ['merchant-portal/BUG-2087/review.md', 'merchant-portal/BUG-2087/security.md'], you: 'Nothing.', dwell: 2800,
+      log: [{ t: 'reviewer · cause, not symptom' }] },
+    { n: '10', short: 'Ready', kind: 'stop', mark: 'you test and decide', title: '“Bug fixed”', who: [['main', 'session']],
+      desc: 'A bug matrix per repo: reproduced before, fixed after, test red → green, regression. Then the cause and fix in three lines, how to test it locally and the commit message.',
+      files: ['hu/BUG-2087/status.md'], you: 'Reviews, tests locally and types “push”.',
+      prompt: 'Bug matrix: before ✅ · after ✅ · red → green ✅', reply: 'push', wait: 1700 },
+    { n: '11', short: 'Push', kind: 'stop', mark: 'you confirm', title: 'Commit and push', who: [['main', 'session']],
+      desc: 'Commits only the planned files and pushes the fix/ branch. A guardrail checks for unplanned files and asks before pushing.',
+      files: [], you: 'Confirms the push.',
+      prompt: 'guardrail: planned files only ✓ · push?', reply: 'yes', wait: 1300,
+      after: [{ t: 'push → merge request link', c: 'dim' }] }
+  ]
+});
+
+hfCmd({
+  id: 'hu-fix', label: '/hu-fix <id>', sub: 'Review comments', stepsNote: '8 steps · 4 checkpoints',
+  note: 'Review comments on a story’s merge request, simulated. Same branch, never a new one, and the same full verification before pushing again.',
+  labels: { rail: 'Steps of /hu-fix', logHead: 'Example run · review comments' },
+  doneHTML: '<b>Merge request updated.</b><span>Same branch, a FIX commit and replies posted after the developer’s OK. Resolving threads and merging stay human.</span>',
+  steps: [
+    { n: '1', short: 'Threads', title: 'Read the merge request threads', who: [['main', 'session']],
+      desc: 'Reads the merge request threads: what each comment asks for and on which line. Without a GitLab token, the developer can paste the comments into the chat.',
+      files: [], you: 'Nothing, unless the token is missing.',
+      log: [{ m: '›', c: 'you', t: '/hu-fix 1042' }, { t: 'gitlab', d: 'merge request threads' }] },
+    { n: '2', short: 'Choose', kind: 'stop', mark: 'you choose', title: 'Which comments apply', who: [['main', 'session']],
+      desc: 'The developer picks which comments to apply; the rest are logged with the reason. If a comment contradicts an earlier decision on the story or the repo profile, it stops and asks instead of deciding alone.',
+      files: [], you: 'Chooses what to apply and, when needed, why not.',
+      prompt: 'Review comments: which ones apply?', reply: 'chosen', wait: 1700 },
+    { n: '3', short: 'Branch', title: 'Same branch', who: [['main', 'session']],
+      desc: 'Goes back to the story’s or the bug’s branch. /hu-fix never creates a new one.',
+      files: [], you: 'Nothing.', dwell: 1800,
+      log: [{ t: 'git checkout feature/US-1042-…', d: 'same branch' }] },
+    { n: '4', short: 'Apply', title: 'Apply and verify', who: [['sonnet', 'implementer'], ['sonnet', 'test-writer'], ['sonnet', 'visual-qa']],
+      desc: 'implementer applies each comment. test-writer joins when the fix touches logic or tested components. visual-qa runs the full regression and a design pass in batches; for an API, api-qa makes the calls.',
+      meter: { type: 'seq', items: [['sonnet', 'implementer'], ['sonnet', 'test-writer'], ['sonnet', 'visual-qa']], result: 'full regression ✅ · design pass ✅' },
+      files: ['merchant-portal/US-1042/visual.md'], you: 'Nothing.', dwell: 3600,
+      log: [{ t: 'implementer → test-writer → visual-qa' }] },
+    { n: '5', short: 'Review', title: 'Review', who: [['opus', 'reviewer'], ['opus', 'security-reviewer'], ['sonnet', 'vuln-scanner']],
+      desc: 'The reviewer always runs. Security only if the fix touches logic; Trivy only if it touches dependencies or the Dockerfile.',
+      meter: { type: 'par', items: [['opus', 'reviewer'], ['opus', 'security-reviewer'], ['sonnet', 'vuln-scanner']] },
+      files: ['merchant-portal/US-1042/review.md'], you: 'Nothing.', dwell: 2600,
+      log: [{ t: 'reviewer', d: 'security and Trivy only when relevant' }] },
+    { n: '6', short: 'Ready', kind: 'stop', mark: 'you test and decide', title: 'Every comment with its status', who: [['main', 'session']],
+      desc: 'Shows each comment with its status, applied and verified or not applied with the reason, and how to test it locally.',
+      files: ['hu/US-1042/status.md'], you: 'Reviews, tests and types “push”.',
+      prompt: 'Comments: status of each one', reply: 'push', wait: 1600 },
+    { n: '7', short: 'Push', kind: 'stop', mark: 'you confirm', title: 'FIX commit and push', who: [['main', 'session']],
+      desc: 'A FIX commit on the same branch and a push. The merge request updates by itself.',
+      files: [], you: 'Confirms the push.',
+      prompt: 'guardrail: planned files only ✓ · push?', reply: 'yes', wait: 1300,
+      after: [{ t: 'push → merge request updated', c: 'dim' }] },
+    { n: '8', short: 'Reply', kind: 'stop', mark: 'you confirm', title: 'Reply on the merge request', who: [['main', 'session']],
+      desc: 'Drafts a reply to each thread and shows the exact text before anything is posted. Resolving threads is asked separately. It also logs whether its own review had caught each comment.',
+      files: [], you: 'Confirms the replies. Resolving threads is a separate question.',
+      prompt: 'Replies on the merge request · preview', reply: 'confirm', wait: 1500,
+      after: [{ t: 'replies posted as the developer', c: 'dim' }] }
+  ]
+});
+
+hfCmd({
+  id: 'mr', label: '/mr <link>', sub: 'Review a teammate’s MR', stepsNote: '5 steps · 2 checkpoints',
+  note: 'A teammate’s merge request, simulated. It reads without touching the developer’s branch and only posts what the developer picks, after showing the exact text.',
+  labels: { rail: 'Steps of /mr', logHead: 'Example run · one merge request' },
+  doneHTML: '<b>Review posted.</b><span>Only what the developer picked, under their own user. Merging, closing or editing the merge request stays human.</span>',
+  steps: [
+    { n: '1', short: 'MR', title: 'Pick the merge request', who: [['main', 'session']],
+      desc: 'With no arguments it shows the inbox: merge requests waiting for review and the developer’s own. With a link it downloads that one (description, pipeline, approvals, diff and threads) and sums it up in five lines.',
+      files: ['admin-portal/MR-128/mr.md', 'admin-portal/MR-128/diff.patch', 'admin-portal/MR-128/threads.md'], you: 'Picks the merge request from the inbox, or passes the link.',
+      log: [{ m: '›', c: 'you', t: '/mr admin-portal!128' }, { t: 'gitlab', d: 'MR, diff, pipeline and threads' }] },
+    { n: '2', short: 'Context', title: 'Context without touching your branch', who: [['main', 'session'], ['sonnet', 'project-scout']],
+      desc: 'Fetches the merge request’s commit and reads files with git show: no branch switch, nothing half-done gets touched. Finds the story from the branch or title and pulls it if missing. If the repo has no profile yet, it builds one on the spot.',
+      files: ['admin-portal/project-profile.md'], you: 'If there is more than one story or none, picks which one to review against.', dwell: 2600,
+      log: [{ t: 'git fetch · git show', d: 'your branch is untouched' }] },
+    { n: '3', short: 'Review', title: 'Review', who: [['opus', 'mr-reviewer'], ['main', 'session']],
+      desc: 'Acceptance criteria, behavior, repo conventions, security, tests, cleanliness, dependencies and pipeline. It reads whole files, not just the diff. Every finding has a severity, evidence and a proposed comment, and the session confirms each blocker in the code before showing it. Problems that predate the merge request are not pinned on the author.',
+      files: ['admin-portal/MR-128/review.md'], you: 'Nothing.', dwell: 3200,
+      log: [{ t: 'mr-reviewer', d: 'findings with evidence and proposed comments' }] },
+    { n: '4', short: 'Decide', kind: 'stop', mark: 'you choose', title: 'Show and decide', who: [['main', 'session']],
+      desc: 'The verdict (approve, approve with comments or request changes), the criteria table and every finding with the exact text that would be posted. Wording can be adjusted before anything goes out.',
+      files: [], you: 'Chooses what gets posted and whether to approve.',
+      prompt: 'Verdict and findings · what gets posted?', reply: 'blockers and major', wait: 1900 },
+    { n: '5', short: 'Post', kind: 'stop', mark: 'you confirm', title: 'Preview and post', who: [['main', 'session']],
+      desc: 'Builds the batch and runs a preview: which merge request, which user and the full text of every comment. The preview issues a code that posting requires, and it expires if the batch, the merge request or the user changes. An approval, if any, goes out last.',
+      files: ['admin-portal/MR-128/batch.json', 'admin-portal/MR-128/posted.md'], you: 'Reads the preview and accepts. A rejection is never retried.',
+      prompt: 'Preview: MR !128 · your user · chosen comments', reply: 'confirm', wait: 1600,
+      after: [{ t: 'posted on GitLab as the developer', c: 'dim' }] }
+  ]
+});
+
+FlowTabs(document.getElementById('fs-hu'), HF_CMDS, { aria: 'hu-flow commands' });
+/* FS-JS:END */
+</script>
+
+</body></html>

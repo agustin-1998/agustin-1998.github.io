@@ -79,7 +79,7 @@ export const agentRun = {
   footer: [
     { value: '12', label: 'agents' },
     { value: '4', label: 'human checkpoints' },
-    { value: '679', label: 'tests on the workflow' },
+    { value: '693', label: 'tests on the workflow' },
   ],
 }
 
@@ -101,17 +101,17 @@ export const work: CaseStudy[] = [
     ],
     decisions: [
       'Humans approve, agents execute: every checkpoint can stop or redirect the run.',
-      'The workflow is software too, so it has its own test suite (679 tests).',
+      'The workflow is software too, so it has its own test suite (693 tests).',
       'Measured before optimizing: a cost analysis of 6,776 agent calls showed that 64% of spend was context being sent again.',
     ],
     metrics: [
       { value: '12', label: 'specialized agents' },
-      { value: '679', label: 'tests on the workflow' },
+      { value: '693', label: 'tests on the workflow' },
       { value: '64%', label: 'of spend found to be re-sent context' },
     ],
     stack: ['Claude Code', 'MCP', 'Hooks', 'Skills', 'Azure DevOps', 'GitLab', 'Vue 3', 'Laravel'],
-    links: [],
-    note: 'Private repository, access on request. Used on 4 user stories and 5 bug fixes so far; it also reviews teammates’ merge requests and is being rolled out to the team. Happy to walk through it on a call.',
+    links: [{ label: 'See it run', href: '/hu-flow/' }],
+    note: 'The code is private; the interactive walkthrough shows each command step by step. Used on 4 user stories and 5 bug fixes so far; it also reviews teammates’ merge requests and is being rolled out to the team. Happy to walk through it on a call.',
   },
   {
     id: 'onprem-ai',

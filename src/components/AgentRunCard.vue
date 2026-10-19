@@ -23,6 +23,7 @@ import { agentRun } from '../data/profile'
     </ol>
     <figcaption class="run-foot">
       <span v-for="m in agentRun.footer" :key="m.label"><strong>{{ m.value }}</strong> {{ m.label }}</span>
+      <a class="see" href="/hu-flow/">See it run <i class="pi pi-arrow-right" aria-hidden="true"></i></a>
     </figcaption>
   </figure>
 </template>
@@ -139,6 +140,24 @@ import { agentRun } from '../data/profile'
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 0.78rem;
+}
+
+.see {
+  margin-left: auto;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.see .pi {
+  font-size: 0.7rem;
+}
+
+.see:hover {
+  text-decoration: underline;
 }
 
 .run-foot strong {
