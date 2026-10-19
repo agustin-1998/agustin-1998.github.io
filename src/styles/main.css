@@ -189,6 +189,32 @@ a.p-button:hover {
   max-width: calc(100vw - 32px);
 }
 
+/* Mobile/tablet menu (PrimeVue Drawer is teleported to <body>, so it is styled here). */
+.site-drawer-mask.p-drawer-mask {
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+}
+
+.p-drawer.site-drawer {
+  width: min(340px, 88vw);
+  background: var(--bg);
+  color: var(--ink);
+  border-left: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.p-drawer.site-drawer .p-drawer-header {
+  border-bottom: 1px solid var(--line);
+}
+
+/* Belt and braces: no page scroll behind the open menu on iOS either. */
+body.p-overflow-hidden {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
