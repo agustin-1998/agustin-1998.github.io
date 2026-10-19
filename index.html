@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Agustín Rodriguez · Senior Full Stack Engineer</title>
+    <meta name="description" content="Senior full stack engineer in Buenos Aires (UTC−3). Vue 3, TypeScript and Laravel, plus AI agent workflows and on-premise RAG. Open to remote roles." />
+    <meta name="author" content="Agustín Rodriguez" />
+    <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1113" media="(prefers-color-scheme: dark)" />
+    <link rel="canonical" href="https://agustin-1998.github.io/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content="Agustín Rodriguez · Senior Full Stack Engineer" />
+    <meta property="og:description" content="Vue and Laravel products, and the AI agent workflows that help ship them." />
+    <meta property="og:url" content="https://agustin-1998.github.io/" />
+    <meta property="og:image" content="https://agustin-1998.github.io/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
+    />
+
+    <script>
+      // Apply the saved or system theme before first paint to avoid a flash.
+      ;(function () {
+        var m = document.documentElement.getAttribute('data-theme')
+        if (m !== 'light' && m !== 'dark') {
+          try { m = localStorage.getItem('theme') } catch (e) {}
+        }
+        if (m !== 'light' && m !== 'dark') {
+          m = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        if (m === 'dark') document.documentElement.classList.add('app-dark')
+      })()
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Agustín Rodriguez",
+        "jobTitle": "Senior Full Stack Engineer",
+        "address": { "@type": "PostalAddress", "addressLocality": "Buenos Aires", "addressCountry": "AR" },
+        "url": "https://agustin-1998.github.io/",
+        "sameAs": ["https://www.linkedin.com/in/agustinrodriguez98", "https://github.com/agustin-1998"],
+        "knowsAbout": ["Vue.js", "TypeScript", "Laravel", "AI agents", "Retrieval-augmented generation"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>
+      <p style="padding:24px;font-family:system-ui">Agustín Rodriguez, Senior Full Stack Engineer (Vue 3, TypeScript, Laravel, AI agents). Email agus.rodriguez777@gmail.com · <a href="https://www.linkedin.com/in/agustinrodriguez98">LinkedIn</a> · <a href="https://github.com/agustin-1998">GitHub</a></p>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
