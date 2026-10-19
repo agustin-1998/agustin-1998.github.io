@@ -127,7 +127,7 @@ export const work: CaseStudy[] = [
       'Retrieval with PostgreSQL and pgvector, filtered by role and by four sensitivity levels (public, internal, confidential, restricted).',
       'A PII layer built on Presidio that tokenizes personal data before a prompt leaves the server, plus prompt-injection checks on retrieved text.',
       'Local models through Ollama, and tools the model calls for anything numeric, so calculations run in Python instead of the model.',
-      'A data plane per client and a central control plane (FastAPI), three React apps (user, local admin, super-admin), and a hash-chained audit log.',
+      'A data plane per client and a central control plane (FastAPI), three Next.js apps (user, local admin, super-admin), and a hash-chained audit log.',
     ],
     decisions: [
       'The model never does math: numbers go to Python through tool calls.',
@@ -136,12 +136,12 @@ export const work: CaseStudy[] = [
     ],
     metrics: [
       { value: '11', label: 'architecture decision records' },
-      { value: '2,700+', label: 'automated test cases (Python and TypeScript)' },
+      { value: '2,852', label: 'passing tests (pytest and Vitest)' },
       { value: '4', label: 'sensitivity levels enforced in retrieval' },
     ],
-    stack: ['Python', 'FastAPI', 'PostgreSQL', 'pgvector', 'Redis', 'Ollama', 'Presidio', 'Claude API', 'React', 'TypeScript', 'Docker'],
+    stack: ['Python', 'FastAPI', 'PostgreSQL', 'pgvector', 'Redis', 'Ollama', 'Presidio', 'Claude API', 'Next.js', 'TypeScript', 'Docker'],
     links: [{ label: 'Source on GitHub', href: 'https://github.com/agustin-1998/onprem-ai-platform' }],
-    note: 'An earlier version was tested on a copy of a real company’s file server with hundreds of documents.',
+    note: 'Piloted on a copy of a real company’s file server with hundreds of documents. The repository is public, with ADRs, security specs and the agent workflow used to build it.',
   },
   {
     id: 'self-service',
