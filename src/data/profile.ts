@@ -48,7 +48,7 @@ export interface Principle {
 
 export const profile = {
   name: 'Agustín Rodriguez',
-  role: 'Senior Full Stack Engineer',
+  role: 'Senior Full Stack Engineer · AI Engineer',
   location: 'Buenos Aires, Argentina',
   timezone: 'UTC−3',
   availability: 'Open to remote roles · full-time or contract',
