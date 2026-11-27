@@ -8,7 +8,7 @@ import { stack, principles } from '../data/profile'
     <div class="container">
       <header class="section-head">
         <p class="label"><span class="num">03</span> / Stack and how I work</p>
-        <h2 id="stack-title">Tools I ship with</h2>
+        <h2 id="stack-title">Skills and tools I ship with</h2>
       </header>
       <div class="groups">
         <div v-for="g in stack" :key="g.name" class="group">

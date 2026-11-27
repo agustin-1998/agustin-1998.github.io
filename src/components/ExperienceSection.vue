@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Timeline from 'primevue/timeline'
 import Tag from 'primevue/tag'
-import { experience } from '../data/profile'
+import { experience, education, languages } from '../data/profile'
 </script>
 
 <template>
@@ -34,6 +34,24 @@ import { experience } from '../data/profile'
           </div>
         </template>
       </Timeline>
+
+      <div class="extra">
+        <div>
+          <h3 class="label">Education &amp; training</h3>
+          <ul class="plain">
+            <li v-for="e in education" :key="e.title">
+              <strong>{{ e.title }}</strong>
+              <span>{{ e.place }}<template v-if="e.period"> · {{ e.period }}</template></span>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="label">Languages</h3>
+          <ul class="plain">
+            <li v-for="l in languages" :key="l"><span>{{ l }}</span></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -111,5 +129,49 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.extra {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 28px;
+  margin-top: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.extra h3 {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 400;
+  margin: 0 0 12px;
+}
+
+.plain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.plain li {
+  display: grid;
+  gap: 2px;
+  font-size: 0.95rem;
+}
+
+.plain strong {
+  font-weight: 600;
+}
+
+.plain span {
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .extra {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 </style>
